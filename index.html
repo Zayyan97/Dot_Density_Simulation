@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+
+    <title>Dot density - POI Jogja Simulation</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.15/esri/themes/dark/main.css"
+    />
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script src="https://js.arcgis.com/4.15/"></script>
+
+    <script>
+      require([
+        "esri/WebMap",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/renderers/DotDensityRenderer",
+        "esri/widgets/Legend",
+        "esri/widgets/Bookmarks",
+        "esri/widgets/Expand"
+      ], function(
+        WebMap,
+        MapView,
+        FeatureLayer,
+        DotDensityRenderer,
+        Legend,
+        Bookmarks,
+        Expand
+      ) {
+        const map = new WebMap({
+          portalItem: {
+            id: "32ebd06891264dcea4aaa7c0819814a4"
+          }
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          highlightOptions: {
+            fillOpacity: 0,
+            color: [50, 50, 50]
+          },
+          popup: {
+            dockEnabled: true,
+            dockOptions: {
+              position: "top-right",
+              breakpoint: false
+            }
+          },
+          constraints: {
+            maxScale: 35000
+          }
+        });
+
+        view.when().then(function() {
+          const dotDensityRenderer = new DotDensityRenderer({
+            dotValue: 100,
+            outline: null,
+            referenceScale: 577790, // 1:577,790 view scale
+            legendOptions: {
+              unit: "Places"
+            },
+            attributes: [
+              {
+                field: "Coffe_Shop",
+                color: "#f23c3f",
+                label: "Coffee Shop"
+              },
+              {
+                field: "Education",
+                color: "#e8ca0d",
+                label: "Education Building"
+              },
+              {
+                field: "Entertainm",
+                color: "#00b6f1",
+                label: "Entertainment Building"
+              },
+              {
+                field: "Historical",
+                color: "#32ef94",
+                label: "Historical Places"
+              },
+              {
+                field: "Office",
+                color: "#ff7fe9",
+                label: "Office"
+              },
+              {
+                field: "Tourism_Pl",
+                color: "#e2c4a5",
+                label: "Tourism Places"
+              },
+              {
+                field: "Hotel",
+                color: "#ff6a00",
+                label: "Hotel"
+              }
+            ]
+          });
+
+          // Add renderer to the layer and define a popup template
+          const url =
+            "https://services8.arcgis.com/22aEWILt579igsi8/arcgis/rest/services/POI_Jogs/FeatureServer";
+          const layer = new FeatureLayer({
+            url: url,
+            minScale: 20000000,
+            maxScale: 35000,
+            title: "Point of Interest",
+            popupTemplate: {
+              title: "{KECAMATAN}, {KABUPATEN}",
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "Coffe_Shop",
+                      label: "Coffee Shop",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    },
+                    {
+                      fieldName: "Education",
+                      label: "Education Building",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    },
+                    {
+                      fieldName: "Entertainm",
+                      label: "Entertainment Building",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    },
+                    {
+                      fieldName: "Historical",
+                      label: "Historical Places",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    },
+                    {
+                      fieldName: "Office",
+                      label: "Tourism_Pl",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    },
+                    {
+                      fieldName: "Tourism_Pl",
+                      label: "Tourism Places",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    },
+                    {
+                      fieldName: "Hotel",
+                      label: "Hotel",
+                      format: {
+                        digitSeparator: true,
+                        places: 0
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            renderer: dotDensityRenderer
+          });
+
+          map.add(layer);
+
+          view.ui.add(
+            [
+              new Expand({
+                view: view,
+                content: new Legend({ view: view }),
+                group: "top-left",
+                expanded: true
+              }),
+              new Expand({
+                view: view,
+                content: new Bookmarks({ view: view }),
+                group: "top-left"
+              })
+            ],
+            "top-left"
+          );
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
